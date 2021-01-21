@@ -143,6 +143,33 @@ def hill(plainText, key, size):
 
     return cipher
 
+def vigenere(plainText,key,mode):
+    plainText = plainText.upper()
+    key = key.upper()
+    if(mode):
+        key += plainText
+    else:
+        rest = int(len(plainText) / len(key)) + 1
+        for i in range(rest):
+            key += key
+    cipher = ""
+    for i in range(0,len(plainText)):
+        cipher += caeser(plainText[i],ord(key[i]) - ord('A'))
+    return cipher
+
+
+def vernam(plainText,key):
+    keyn = []
+    plainText = plainText.upper()
+
+    length = len(key)
+    cipher = ""
+    for i in range(0,len(plainText)):
+        s =  ord(plainText[i]) - ord('A')    
+        p = s ^ ( ord(key[i % length]) - ord('A') )
+        cipher += chr(p + ord('A'))
+    return cipher
+
 
 def read(fileLocaion):
     file = open(fileLocaion, "r")
@@ -184,30 +211,76 @@ if __name__ == "__main__":
     # key_h = np.array([[5 , 17] , [8 , 3]])
     # hill('abcd',key_h,2)
 
-    plains = read("hill_plain_2x2.txt") # hill_2x2
-    key = np.array([[5,17],[8,3]])
-    ciphers = []
-    for p in plains:
-        ciphers.append(hill(p,key,2))
-    write("hill_cipher_2x2.txt", ciphers)
+    # plains = read("hill_plain_2x2.txt") # hill_2x2
+    # key = np.array([[5,17],[8,3]])
+    # ciphers = []
+    # for p in plains:
+    #     ciphers.append(hill(p,key,2))
+    # write("hill_cipher_2x2.txt", ciphers)
 
-    plains = read("hill_plain_3x3.txt") # hill_3x3
-    key = np.array([[2,4,12],[9,1,6],[7,5,3]])
-    ciphers = []
-    for p in plains:
-        ciphers.append(hill(p,key,3))
-    write("hill_cipher_3x3.txt", ciphers)
+    # plains = read("hill_plain_3x3.txt") # hill_3x3
+    # key = np.array([[2,4,12],[9,1,6],[7,5,3]])
+    # ciphers = []
+    # for p in plains:
+    #     ciphers.append(hill(p,key,3))
+    # write("hill_cipher_3x3.txt", ciphers)
 
-    # while(True):
-    #     print('Please Enter Plain Text:')
-    #     plainText = input()
-    #     print('Please Enter a key for Caesar Cipher:')
-    #     key_c = int(input())
-    #     print('Please Enter a key for Play Fair Cipher:')
-    #     key_pf = int(input())
+    # plains = read("vigenere_plain.txt") # Vigenere
+    # keys = [("PIE",False), ("AETHER", True)]
+    # ciphers = []
+    # for k in keys:
+    #     ciphers.append("key: " + str(k[0]) + ", mode: " + ("auto mode" if k[1] else "repeating mode"))
+    #     for p in plains:
+    #         ciphers.append(vigenere(p,k[0],k[1]))
+    #     ciphers.append("\n")
+    # write("vigenere_cipher.txt", ciphers)
 
-    #     print("Caesar Cipher:"+caeser(plainText,key_c))
-    #     print("Play Fair Cipher:"+playfair(plainText,key_c))
+
+    #  key_h = " 5 , 17 ; 3 ,     8 "
+    #  v = key_h.strip().split(';')
+    #  print(v)
+
+    # plains = read("vernam_plain.txt") # vernam
+    # keys = ["SPARTANS"]
+    # ciphers = []
+    # for k in keys:
+    #     ciphers.append("key: " + str(k))
+    #     for p in plains:
+    #         ciphers.append(vernam(p,k))
+    #     ciphers.append("\n")
+    # write("vernam_cipher.txt", ciphers)
+
+    while(True):
+        print('Please Enter Plain Text:')
+        plainText = input()
+        print('Please Enter a key for Caesar Cipher:')
+        key_c = int(input())
+        print('Please Enter a key for Play Fair Cipher:')
+        key_pf = str(input())
+        print('Please Enter a key for Hill Cipher first enter size (if 3x3 then type 3):')
+        size = int(input())
+        arr = [[1 for i in range(size)] for j in range(size)] 
+        print('Please Enter each number from top to bottom left to right:')
+        for i in range(size):
+            for j in range(size):
+                s = int(input('input number in row '+ str(i+1) + ' and column ' + str(j+1) +': ' ) )
+                arr[i][j] = s
+        
+        l = np.array(arr)
+        print('Please Enter a key for Vigenere Cipher:')
+        key_vi = input()
+        print('Please Enter a mode for Vigenere Cipher (1 means auto and 0 means repeat ):')
+        mode = int(input())
+
+        print('\n')
+        print("Caesar Cipher:"+caeser(plainText,key_c))
+        print('\n')
+        print("Play Fair Cipher:"+playfair(plainText,key_pf))
+        print('\n')
+        print("Hill Cipher:"+hill(plainText,l,size))
+        print('\n')
+        print("Vigenere Cipher:"+vigenere(plainText,key_vi,mode))
+        print('\n')
 
         # print('input C for Caesar Cipher')
         # print('input PF for Play Fair Cipher')
