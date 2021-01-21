@@ -123,8 +123,25 @@ def playfair(plainText,key):
 
     return cipher 
         
+def hill(plainText, key, size):
+    plainText = plainText.upper()
+    
+    while( len(plainText) % size != 0):
+        plainText += "X"
 
+    cipher = ""
+    i = 0
+    while i < len(plainText):
+        l = [ord(plainText[i+x])-65 for x in range(size) ]
+        l = np.array(l)
+        l = l.reshape(1,l.shape[0])
+        i += size
+        c = np.dot(l,key)
+        c = c % 26
+        for num in c[0,:]:
+            cipher += chr(num+65)
 
+    return cipher
 
 
 def read(fileLocaion):
@@ -164,17 +181,33 @@ if __name__ == "__main__":
     #     ciphers.append("\n")
     # write("playfair_cipher.txt", ciphers)
 
+    # key_h = np.array([[5 , 17] , [8 , 3]])
+    # hill('abcd',key_h,2)
 
-    while(True):
-        print('Please Enter Plain Text:')
-        plainText = input()
-        print('Please Enter a key for Caesar Cipher:')
-        key_c = int(input())
-        print('Please Enter a key for Play Fair Cipher:')
-        key_pf = int(input())
+    plains = read("hill_plain_2x2.txt") # hill_2x2
+    key = np.array([[5,17],[8,3]])
+    ciphers = []
+    for p in plains:
+        ciphers.append(hill(p,key,2))
+    write("hill_cipher_2x2.txt", ciphers)
 
-        print("Caesar Cipher:"+caeser(plainText,key_c))
-        print("Play Fair Cipher:"+playfair(plainText,key_c))
+    plains = read("hill_plain_3x3.txt") # hill_3x3
+    key = np.array([[2,4,12],[9,1,6],[7,5,3]])
+    ciphers = []
+    for p in plains:
+        ciphers.append(hill(p,key,3))
+    write("hill_cipher_3x3.txt", ciphers)
+
+    # while(True):
+    #     print('Please Enter Plain Text:')
+    #     plainText = input()
+    #     print('Please Enter a key for Caesar Cipher:')
+    #     key_c = int(input())
+    #     print('Please Enter a key for Play Fair Cipher:')
+    #     key_pf = int(input())
+
+    #     print("Caesar Cipher:"+caeser(plainText,key_c))
+    #     print("Play Fair Cipher:"+playfair(plainText,key_c))
 
         # print('input C for Caesar Cipher')
         # print('input PF for Play Fair Cipher')
