@@ -159,7 +159,8 @@ def vigenere(plainText,key,mode):
 
 
 def vernam(plainText,key):
-    keyn = []
+    #should i make it upper
+    #key = key.upper()
     plainText = plainText.upper()
 
     length = len(key)
@@ -167,6 +168,7 @@ def vernam(plainText,key):
     for i in range(0,len(plainText)):
         s =  ord(plainText[i]) - ord('A')    
         p = s ^ ( ord(key[i % length]) - ord('A') )
+        #should i make p % 26
         cipher += chr(p + ord('A'))
     return cipher
 
@@ -271,6 +273,8 @@ if __name__ == "__main__":
         key_vi = input()
         print('Please Enter a mode for Vigenere Cipher (1 means auto and 0 means repeat ):')
         mode = int(input())
+        print('Please Enter a key for vernam Cipher:')
+        key_ve = input()
 
         print('\n')
         print("Caesar Cipher:"+caeser(plainText,key_c))
@@ -281,6 +285,13 @@ if __name__ == "__main__":
         print('\n')
         print("Vigenere Cipher:"+vigenere(plainText,key_vi,mode))
         print('\n')
+        print("vernam Cipher:"+vernam(plainText,key_ve))
+        print('\n')
+        print('type (y) if want to exit else type (n)')
+        ex = input()
+        if(ex == 'y'):
+            break
+
 
         # print('input C for Caesar Cipher')
         # print('input PF for Play Fair Cipher')
