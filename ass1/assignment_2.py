@@ -169,18 +169,27 @@ def list_to_str(ls):
 
 
 def strbin_To_num(strbin):
-        num = int(strbin, 2)
-        return num
+    num = int(strbin, 2)
+    return num
 
+
+# def num_To_strbin(num,pad):
+#     strbin = bin(num)
+#     strbin = strbin.replace("0b","")
+# 	temp = ""
+#     for i in range(pad - len(strbin)):
+#         temp += "0"
+        
+#     return temp + strbin
 
 def num_To_strbin(num,pad):
-        strbin = bin(num)
-        strbin = strbin.replace("0b","")
-        temp = ""
-        for i in range(pad - len(strbin)):
-           temp += "0"
-        
-        return temp + strbin
+	strbin = bin(num)
+	strbin = strbin.replace('0b','')
+	temp = ''
+	for i in range(pad -len(strbin)):
+		temp += '0'
+	
+	return temp + strbin
 
 def apply_perm(ls,perm):
 	temp = []
@@ -216,24 +225,82 @@ def get_keys(init_key):
 
 	return keys
 
+def xor(x,y):
+	res = []
+	for i in range(len(x)):
+		if x[i] == y[i]:
+			res.append('0')
+		else:
+			res.append('1')
+	return res
+
+def subs(ls):
+	ls = split_to(ls,8)
+	res = []
+	for i in range(8):
+		cho = ls[i][0] + ls[i][-1]
+		cho_h = strbin_To_num(cho)
+		cho_v = ls[i][1] + ls[i][2] + ls[i][3] + ls[i][4]
+		cho_v = strbin_To_num(cho_v)
+		t = S_BOX[i][cho_h][cho_v]
+		t = num_To_strbin(t,4)
+		for c in t:
+			res.append(c)
+	return res
+
+
+
 def round(inp,key):
 	inp = split_to(inp,2)
 	L = inp[0]
 	R = inp[1]
-	print(L)
-	print(R)
+	nL = R
+	nR = apply_perm(R,E)
+	nR = xor(nR,key)
+	nR = subs(nR)
+	nR = apply_perm(nR,P)
+	nR = xor(nR,L)
+	return nL + nR
+
+def des_enc(pt,key):
+	key = hex_To_bin(key)
+	key = str_to_list(key)
+	keys = get_keys(key)
+	inp = hex_To_bin(pt)
+	inp = str_to_list(inp)
+	inp = apply_perm(inp,I)
+	for i in range(16):
+		inp = round(inp,keys[i])
+	t = inp[32:] + inp[:32]
+	print(len(t))
+	res = apply_perm(t,PI_1)
+	res = list_to_str(res)
+	res = bin_To_hex(res)
+	return res
+
+	
 
 pt = "123456ABCD132536"
 key = "AABB09182736CCDD"
-key = hex_To_bin(key)
-key = str_to_list(key)
-keys = get_keys(key)
 
-inp = hex_To_bin(pt)
-inp = str_to_list(inp)
-inp = apply_perm(inp,I)
-print(inp)
-round(inp,key)
+res = des_enc(pt,key)
+print(res)
+
+# key = hex_To_bin(key)
+# key = str_to_list(key)
+# keys = get_keys(key)
+
+# inp = hex_To_bin(pt)
+# inp = str_to_list(inp)
+# inp = apply_perm(inp,I)
+# res = round(inp,keys[0])
+# res = round(res,keys[1])
+# res = list_to_str(res)
+# res = bin_To_hex(res)
+# print(res[8:])
+# print(res[:8])
+# res = split_to(res,2)
+# print(res[0],res[1])
 
 # for key in keys:
 # 	l = list_to_str(key)
