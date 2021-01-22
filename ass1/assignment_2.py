@@ -272,19 +272,52 @@ def des_enc(pt,key):
 	for i in range(16):
 		inp = round(inp,keys[i])
 	t = inp[32:] + inp[:32]
-	print(len(t))
 	res = apply_perm(t,PI_1)
 	res = list_to_str(res)
 	res = bin_To_hex(res)
 	return res
 
-	
 
-pt = "123456ABCD132536"
-key = "AABB09182736CCDD"
+def des_dec(ci,key):
+	key = hex_To_bin(key)
+	key = str_to_list(key)
+	keys = get_keys(key)
+	keys = keys[::-1]
+	inp = hex_To_bin(ci)
+	inp = str_to_list(inp)
+	inp = apply_perm(inp,I)
+	for i in range(16):
+		inp = round(inp,keys[i])
+	t = inp[32:] + inp[:32]
+	res = apply_perm(t,PI_1)
+	res = list_to_str(res)
+	res = bin_To_hex(res)
+	return res
 
-res = des_enc(pt,key)
-print(res)
+
+
+if __name__ == "__main__":
+
+	while(True):
+		print('please enter 16 hex chars for the key:')
+		key = input()
+		print('please enter 16 hex chars for the plain text:')
+		pt = input()
+		print('please enter an int for number of times to run')
+		num = int(input())
+		res = pt
+		for i in range(num):
+			res = des_enc(res,key)
+
+		print('output cipher is : ' + res)
+		print('\n')
+		print('if want to exit type (y)')
+		ic = input()
+		if ic == 'y':
+			break
+		
+
+
 
 # key = hex_To_bin(key)
 # key = str_to_list(key)
