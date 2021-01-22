@@ -103,8 +103,8 @@ PI_1 = [40, 8, 48, 16, 56, 24, 64, 32,
 #Matrix that determine the shift for each round of keys
 SHIFT = [1,1,2,2,2,2,2,2,1,2,2,2,2,2,2,1]
 
-def hex2bin(s): 
-    mp = {'0' : "0000",  
+def hex_To_bin(s): 
+    dic = {'0' : "0000",  
           '1' : "0001", 
           '2' : "0010",  
           '3' : "0011", 
@@ -122,12 +122,12 @@ def hex2bin(s):
           'F' : "1111" } 
     bin = "" 
     for i in range(len(s)):
-        bin = bin + mp[s[i]] 
+        bin += dic[s[i]] 
     return bin
       
-# Binary to hexadecimal conversion 
-def bin2hex(s): 
-    mp = {"0000" : '0',  
+
+def bin_To_hex(s): 
+    dic = {"0000" : '0',  
           "0001" : '1', 
           "0010" : '2',  
           "0011" : '3', 
@@ -146,19 +146,31 @@ def bin2hex(s):
     hex = "" 
     for i in range(0,len(s),4): 
         ch = "" 
-        ch = ch + s[i] 
-        ch = ch + s[i + 1]  
-        ch = ch + s[i + 2]  
-        ch = ch + s[i + 3]  
-        hex = hex + mp[ch] 
+        ch += s[i] 
+        ch += s[i + 1]  
+        ch += s[i + 2]  
+        ch += s[i + 3]  
+        hex += dic[ch] 
           
     return hex
   
-# Binary to decimal conversion 
+
+def str_to_list(s):
+	ls = []
+	for char in s:
+		ls.append(char)
+	return ls
+
+def list_to_str(ls):
+	s = ""
+	for char in ls:
+		s += char
+	return s
 
 
 def strbin_To_num(strbin):
-        num = int(binary_str, 2)
+        num = int(strbin, 2)
+        return num
 
 
 def num_To_strbin(num,pad):
@@ -170,17 +182,78 @@ def num_To_strbin(num,pad):
         
         return temp + strbin
 
+def apply_perm(ls,perm):
+	temp = []
+	for i in perm:
+		temp.append(ls[i-1])
+	
+	return temp
 
+def split_to(ls,n):
+	splits = []
+	for i in range(n):
+		sp = []
+		for j in range(int(len(ls)/n)):
+			v = int(len(ls)/n)
+			sp.append(ls[v * i + j])
+		splits.append(sp)
+	return splits
 
+def shift_key(key,i):
+	return key[i:] + key[:i]
 
+def get_keys(init_key):
+	keys = []
+	key = apply_perm(init_key,CP_1)
+	for i in range(16):
+		temp = []
+		key = split_to(key,2)
+		k1 = shift_key(key[0],SHIFT[i])
+		k2 = shift_key(key[1],SHIFT[i])
+		key = k1 + k2
+		t = apply_perm(key,CP_2)
+		keys.append(t)
 
+	return keys
 
-binary_str = '0110' # Binary string
-binary_str2 = '0111'
+def round(inp,key):
+	inp = split_to(inp,2)
+	L = inp[0]
+	R = inp[1]
+	print(L)
+	print(R)
 
-num2 = int(binary_str2, 2)
-num = int(binary_str, 2)
+pt = "123456ABCD132536"
+key = "AABB09182736CCDD"
+key = hex_To_bin(key)
+key = str_to_list(key)
+keys = get_keys(key)
 
-v = num ^ num2
+inp = hex_To_bin(pt)
+inp = str_to_list(inp)
+inp = apply_perm(inp,I)
+print(inp)
+round(inp,key)
 
-print(num_To_strbin(v,4))
+# for key in keys:
+# 	l = list_to_str(key)
+# 	l = bin_To_hex(l)
+# 	print(l)
+# s = '0123456789ABCDEF'
+# s1 = hex_To_bin(s)
+# s2 = bin_To_hex(s1)
+# s3 = strbin_To_num(s1)
+# s4 = num_To_strbin(s3,64)
+# print(s,s1)
+# print(s2,s3)
+# print(s4)
+
+# binary_str = '0110' # Binary string
+# binary_str2 = '0111'
+
+# num2 = int(binary_str2, 2)
+# num = int(binary_str, 2)
+
+# v = num ^ num2
+
+# print(num_To_strbin(v,4))
