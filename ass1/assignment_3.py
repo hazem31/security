@@ -188,6 +188,21 @@ def subs(s):
             s[i][j] = look_sub(s[i][j])
     return s
 
+def look_isub(num):
+    first = int(num/16)
+    second = num % 16
+    t = inv_s_box[16*first+second]
+    t = hex(t)[2:]
+    t = int(t,16)
+    return t
+
+
+def inv_subs(s):
+    for i in range(s.shape[0]):
+        for j in range(s.shape[1]):
+            s[i][j] = look_sub(s[i][j])
+    return s
+
 
 def g_func(key,i):
     s = np.array(key,copy=True)
@@ -215,15 +230,52 @@ def get_keys(key):
         keys.append(temp)        
     return keys
 
+def add_round_key(s,key):
+    return s ^ key
+
+def shift_rows(s):
+    shifts = [0,1,2,3]
+    temp = np.array(s,copy=True)
+    for i in range(1,4,1):
+        s1 = s[i:i+1,shifts[i]:]
+        s2 = s[i:i+1,:shifts[i]]
+        temp[i:i+1,:] = np.concatenate((s1,s2),axis=1)
+    return temp
+
+def inv_shift_rows(s):
+    shifts = [0,1,2,3]
+    temp = np.array(s,copy=True)
+    for i in range(1,4,1):
+        s1 = s[i:i+1,4-shifts[i]:]
+        s2 = s[i:i+1,:4-shifts[i]]
+        temp[i:i+1,:] = np.concatenate((s1,s2),axis=1)
+    return temp
+
+
+
 key = '0123456789ABCDEF0123456789ABCDEF'
 pt = '0123456789ABCDEF0123456789ABCDEF'
 
+pt2 = '54776F204F6E65204E696E652054776F'
 key2 = '5468617473206D79204B756E67204675'
 
-s = get_keys(key2)
+keys = get_keys(key2)
+s = convert_to_matrix(pt2)
 
-for key in s:
-    print(key)
+s = add_round_key(s,keys[0])
+s = subs(s)
+print(s)
+s = shift_rows(s)
+print(s)
+s = inv_shift_rows(s)
+print(s)
+
+
+
+# for key in s:
+#     print(key)
+
+#print(pt)
 #print(return_to_str(s))
 
 # s = subs(s)
