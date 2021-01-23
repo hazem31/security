@@ -199,27 +199,31 @@ def g_func(key,i):
     s = np.array(s)
     s = subs(s)
     s[0,0] = s[0,0] ^ r_con[i]
-    s = s ^ key[:,0:1]
-    print(s)
+    return s
 
 def get_keys(key):
     key  = convert_to_matrix(key)
     keys = []
     keys.append(key)
     for i in range(1,11,1):
+        temp = np.array(key,copy=True)
         t = g_func(keys[i-1],i)
-        break
+        for j in range(key.shape[1]):
+            v = keys[i-1][:,j:j+1]
+            temp[:,j:j+1] = np.bitwise_xor(v ,t)
+            t = temp[:,j:j+1]
+        keys.append(temp)        
+    return keys
 
 key = '0123456789ABCDEF0123456789ABCDEF'
 pt = '0123456789ABCDEF0123456789ABCDEF'
 
 key2 = '5468617473206D79204B756E67204675'
 
-s = convert_to_matrix(key2)
-print(s)
+s = get_keys(key2)
 
-get_keys(key2)
-
+for key in s:
+    print(key)
 #print(return_to_str(s))
 
 # s = subs(s)
