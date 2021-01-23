@@ -252,6 +252,43 @@ def inv_shift_rows(s):
     return temp
 
 
+xtime = lambda a: (((a << 1) ^ 0x1B) & 0xFF) if (a & 0x80) else (a << 1)
+
+def mix_single_column(a):
+    t = a[0] ^ a[1] ^ a[2] ^ a[3]
+    u = a[0]
+    a[0] ^= t ^ xtime(a[0] ^ a[1])
+    a[1] ^= t ^ xtime(a[1] ^ a[2])
+    a[2] ^= t ^ xtime(a[2] ^ a[3])
+    a[3] ^= t ^ xtime(a[3] ^ u)
+    return np.array(a).reshape(4,1)
+
+
+def mix_columns(s):
+    temp = np.array(s,copy=True)
+    for i in range(4):
+        v = s[:,i]
+        v = v.tolist()
+        v = mix_single_column(v)
+        temp[:,i:i+1] = v
+    return temp
+
+
+def inv_mix_columns(s):
+    temp = np.array(s,copy=True)
+    temp = temp.T
+    s = temp.tolist()
+    for i in range(4):
+        u = xtime(xtime(s[i][0] ^ s[i][2]))
+        v = xtime(xtime(s[i][1] ^ s[i][3]))
+        s[i][0] ^= u
+        s[i][1] ^= v
+        s[i][2] ^= u
+        s[i][3] ^= v
+    s = np.array(s)
+    s = s.T
+    s = mix_columns(s)
+    return s
 
 key = '0123456789ABCDEF0123456789ABCDEF'
 pt = '0123456789ABCDEF0123456789ABCDEF'
@@ -264,14 +301,16 @@ s = convert_to_matrix(pt2)
 
 s = add_round_key(s,keys[0])
 s = subs(s)
-print(s)
+#print(s)
 s = shift_rows(s)
+#print(s)
+#print(s)
+s = mix_columns(s)
+#print(s)
+s = add_round_key(s,keys[1])
 print(s)
-s = inv_shift_rows(s)
+s = list_to_str(s.tolist())
 print(s)
-
-
-
 # for key in s:
 #     print(key)
 
