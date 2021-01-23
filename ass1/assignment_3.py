@@ -171,7 +171,10 @@ def return_to_str(s):
     s1 = np.array(s.T,copy=True)
     for i in range(4):
         for j in range(4):
-            temp += hex(s1[i,j])[2:].upper()
+            v = hex(s1[i,j])[2:].upper()
+            if len(v) == 1:
+                v = '0' + v
+            temp += v
     return temp
 
 def look_sub(num):
@@ -200,7 +203,7 @@ def look_isub(num):
 def inv_subs(s):
     for i in range(s.shape[0]):
         for j in range(s.shape[1]):
-            s[i][j] = look_sub(s[i][j])
+            s[i][j] = look_isub(s[i][j])
     return s
 
 
@@ -290,27 +293,111 @@ def inv_mix_columns(s):
     s = mix_columns(s)
     return s
 
+def round(s,key):
+    s = subs(s)
+    s = shift_rows(s)
+    s = mix_columns(s)
+    s = add_round_key(s,key)
+    return s
+
+def inv_round(s,key):
+    s = inv_shift_rows(s)
+    s = inv_subs(s)
+    s = add_round_key(s,key)
+    s = inv_mix_columns(s)
+    return s
+
+def inv_final_round(s,key):
+    s = inv_shift_rows(s)
+    s = inv_subs(s)
+    s = add_round_key(s,key)
+    return s
+
+def final_round(s,key):
+    s = subs(s)
+    s =shift_rows(s)
+    s = add_round_key(s,key)
+    return s
+
+def aes_enc(pt,key):
+    keys = get_keys(key)    
+    s = convert_to_matrix(pt)
+    s = add_round_key(s,keys[0])
+    for i in range(1,10,1):
+        s = round(s,keys[i])
+    s = final_round(s,keys[-1])
+    s = return_to_str(s)
+    return s
+
+def aes_dec(cipher,key):
+    keys = get_keys(key)
+    keys = keys[::-1]    
+    s = convert_to_matrix(cipher)
+    s = add_round_key(s,keys[0])
+    for i in range(1,10,1):
+        s = inv_round(s,keys[i])
+    s = inv_final_round(s,keys[-1])
+    s = return_to_str(s)
+    return s
+
 key = '0123456789ABCDEF0123456789ABCDEF'
 pt = '0123456789ABCDEF0123456789ABCDEF'
 
 pt2 = '54776F204F6E65204E696E652054776F'
 key2 = '5468617473206D79204B756E67204675'
 
-keys = get_keys(key2)
-s = convert_to_matrix(pt2)
 
-s = add_round_key(s,keys[0])
-s = subs(s)
+
+if __name__ == "__main__":
+
+	while(True):
+		print('please enter 32 hex chars for the key:')
+		key = input()
+		print('please enter 32 hex chars for the plain text:')
+		pt = input()
+		res = aes_enc(pt,key)
+		print('output cipher is : ' + res)
+		print('\n')
+		print('if want to exit type (y)')
+		ic = input()
+		if ic == 'y':
+			break
+		
+
+
+# s = aes_enc(pt,key)
+# #print(s)
+# for i in range(0,len(s),2):
+#     print(s[i:i+2],end=' ')
+# print()
+
+# s = aes_dec(s,key)
+# for i in range(0,len(s),2):
+#     print(s[i:i+2],end=' ')
+
+# keys = get_keys(key2)
+# s = convert_to_matrix(pt2)
+
+# s = add_round_key(s,keys[0])
+# print(s)
+# s = round(s,keys[1])
+# print(s)
+# s = inv_round(s,keys[1])
+# print(s)
 #print(s)
-s = shift_rows(s)
+#s = subs(s)
+#print(s)
+#s = inv_subs(s)
+#print(s)
+#s = shift_rows(s)
 #print(s)
 #print(s)
-s = mix_columns(s)
+#s = mix_columns(s)
 #print(s)
-s = add_round_key(s,keys[1])
-print(s)
-s = list_to_str(s.tolist())
-print(s)
+#s = add_round_key(s,keys[1])
+#print(s)
+#s = return_to_str(s)
+#print(s)
 # for key in s:
 #     print(key)
 
